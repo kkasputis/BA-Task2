@@ -1,0 +1,59 @@
+Sveiki, kad viskas veiktų, neskaitant kelių akivaizdžiu klaidelių API serverio sukūrimo instrukcijoje,
+reikėjo pakoreguoti API serverį, jei tiksliau, į server.js failą pridėti: 
+
+       app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+
+  next();
+});
+
+
+Visas server.js:
+
+const express = require('express');
+       const app = express();
+       const fs = require('fs');
+       
+       const PORT = 3212;
+       const FILE = './feedbacks.json';
+       
+       async function writeToFile(body) {
+           const comments = await readFromFile();
+           comments.push(body);
+           const error = fs.writeFileSync(FILE, JSON.stringify(comments));
+           return error;
+       }
+       
+       async function readFromFile() {
+           const rawdata = await fs.readFileSync(FILE);
+           const comments = JSON.parse(rawdata);
+       
+           return comments;
+       }
+       
+       app.use(express.json());
+       app.use(express.urlencoded({ extended: true }));
+       app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+
+  next();
+});
+       app.post('/feedbacks', async function(req, res) {
+	console.log(req.body);
+	console.log(req.mode);
+	console.log(req.headers);
+           await writeToFile(req.body);
+               res.json({
+                   success: true,
+                   body: req.body
+               });
+       });
+       
+ app.get('/feedbacks', async function(req, res) {
+           res.json({
+               success: true,
+               body: await readFromFile()
+           });
+       });
+       
+       app.listen(PORT, () => console.log(`Server app listening on port ${PORT}!`));
