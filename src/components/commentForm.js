@@ -25,7 +25,7 @@ class CommentForm extends Component {
         let year = newDate.getFullYear();
         let hours = newDate.getHours();
         let minutes = newDate.getMinutes();
-        return `${year}${separator}${month<10?`0${month}`:`${month}`}${separator}${date}[${hours}:${minutes}]`
+                return `${year}${separator}${month<10?`0${month}`:`${month}`}${separator}${date}[${hours}:${minutes<10?`0${minutes}`:`${minutes}`}]`
         }
     async postData() {
         try {
